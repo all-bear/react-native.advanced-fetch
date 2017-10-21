@@ -112,6 +112,7 @@ test('it should request version if device is online and request content version 
   const testRequest = new Request(testUrl, testParams);
   testRequest.setVersion(testVersion + 1);
 
+  RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
   RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(testRequest));
 
   return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then(res => res.json()).then((response) => {
@@ -155,6 +156,7 @@ test('it should request version if device is online and cache doesn`t exists on 
   const testRequest = new Request(testUrl, testParams);
   testRequest.setVersion(testVersion + 1);
 
+  RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
   RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(null));
 
   return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then(res => res.json()).then((response) => {
@@ -172,7 +174,7 @@ test('it should request version if device is online and cache doesn`t exists on 
 
 test('it should request version if device is online and get content from cache if version is same on version cached fetch', () => {
   const testVersion = 12;
-  const testResponse = {body: 'html lorem ipsum'};
+  const testResponse = {body: 'html lorem ipsum', version: null};
 
   onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
 
@@ -193,6 +195,7 @@ test('it should request version if device is online and get content from cache i
   testRequest.setVersion(testVersion);
   testRequest.setResponse(testResponse);
 
+  RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
   RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(testRequest));
 
   return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then(res => res.json()).then((response) => {
@@ -207,7 +210,7 @@ test('it should request version if device is online and get content from cache i
   });
 });
 
-test('it get content from cache if device is offline on version cached fetch', () => {
+test('it should get content from cache if device is offline on version cached fetch', () => {
   onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(false));
 
   const testUrl = 'http://abracadabra.com';
@@ -232,7 +235,7 @@ test('it get content from cache if device is offline on version cached fetch', (
   });
 });
 
-test('it throws exception if cache is empty and if device is offline on version cached fetch', () => {
+test('it should throws exception if cache is empty and if device is offline on version cached fetch', () => {
   onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(false));
 
   const testUrl = 'http://abracadabra.com';
@@ -253,3 +256,38 @@ test('it throws exception if cache is empty and if device is offline on version 
   });
 });
 
+test('it should save response with version if device is online and on version cached fetch', () => {
+  const testVersion = 12;
+  const testResponse = {body: 'html lorem ipsum', version: testVersion};
+
+  onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
+
+  fetchMock = jest.fn()
+    .mockReturnValueOnce(new Promise(resolve => resolve({
+      json: () => Promise.resolve({version: testVersion})
+    })))
+    .mockReturnValueOnce(new Promise(resolve => resolve({
+      json: () => Promise.resolve(testResponse)
+    })));
+
+  const testVersionUrl = 'http://abracadabra.com/version';
+  const testUrl = 'http://abracadabra.com';
+  const testParams = {
+    headers: {
+      someKey: 'someValue'
+    }
+  };
+
+  const testRequest = new Request(testUrl, testParams);
+  testRequest.setVersion(testVersion);
+
+  RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(null));
+  RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
+
+  global.fetch = fetchMock;
+
+  return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then(res => res.json()).then(() => {
+    expect(RequestCacheMock.add).toBeCalled();
+    expect(RequestCacheMock.add.mock.calls[0][0]).toEqual(testRequest);
+  });
+});
