@@ -9,14 +9,17 @@ beforeEach(() => {
     AsyncStorage: AsyncStorageMock
   }));
 
-  AsyncStorageMock = {};
+  AsyncStorageMock = {
+    setItem: jest.fn(),
+    getItem: jest.fn()
+  };
 
   RequestQuery = require('../../lib/request-query');
 });
 
 test('it should save query with added request on add new request to empty query', () => {
-  AsyncStorageMock.setItem = jest.fn(() => new Promise((resolve) => resolve()));
-  AsyncStorageMock.getItem = jest.fn(() => new Promise((resolve) => resolve(null)));
+  AsyncStorageMock.setItem.mockReturnValue(Promise.resolve());
+  AsyncStorageMock.getItem.mockReturnValue(Promise.resolve(null));
 
   const testUrl = 'http://abracadabra.com';
   const testParams = {
@@ -56,13 +59,13 @@ test('it should save query with added request on add new request to filled query
   };
 
 
-  AsyncStorageMock.setItem = jest.fn(() => new Promise((resolve) => resolve()));
-  AsyncStorageMock.getItem = jest.fn(() => new Promise((resolve) => resolve(JSON.stringify([
+  AsyncStorageMock.setItem.mockReturnValue(Promise.resolve());
+  AsyncStorageMock.getItem.mockReturnValue(Promise.resolve(JSON.stringify([
     {
       url: savedTestUrl,
       params: savedTestParams
     }
-  ]))));
+  ])));
 
   const testUrl = 'http://abracadabra.com';
   const testParams = {
@@ -105,13 +108,13 @@ test('it should load query', () => {
       someKey: 'someValue'
     }
   };
-  AsyncStorageMock.setItem = jest.fn(() => new Promise((resolve) => resolve()));
-  AsyncStorageMock.getItem = jest.fn(() => new Promise((resolve) => resolve(JSON.stringify([
+  AsyncStorageMock.setItem.mockReturnValue(Promise.resolve());
+  AsyncStorageMock.getItem.mockReturnValue(Promise.resolve(JSON.stringify([
     {
       url: savedTestUrl,
       params: savedTestParams
     }
-  ]))));
+  ])));
 
   return RequestQuery.load().then((query) => {
     expect(AsyncStorageMock.setItem).not.toBeCalled();
@@ -129,13 +132,13 @@ test('it should clear query if flag is presented', () => {
     }
   };
 
-  AsyncStorageMock.setItem = jest.fn(() => new Promise((resolve) => resolve()));
-  AsyncStorageMock.getItem = jest.fn(() => new Promise((resolve) => resolve(JSON.stringify([
+  AsyncStorageMock.setItem.mockReturnValue(Promise.resolve());
+  AsyncStorageMock.getItem.mockReturnValue(Promise.resolve(JSON.stringify([
     {
       url: savedTestUrl,
       params: savedTestParams
     }
-  ]))));
+  ])));
 
   return RequestQuery.load(true).then((query) => {
     expect(AsyncStorageMock.getItem.mock.calls[0][0]).toBe('@AdvancedFetch:query');
