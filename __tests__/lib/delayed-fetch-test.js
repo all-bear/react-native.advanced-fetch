@@ -3,8 +3,6 @@ let fetchMock;
 let fetchResponseMock;
 let onlineHelperMock;
 let RequestQueryMock;
-let addRequestMock;
-let loadRequestMock;
 
 import Request from '../../lib/request';
 
@@ -15,18 +13,19 @@ beforeEach(() => {
   jest.doMock('../../lib/request-query', () => RequestQueryMock);
   jest.doMock('../../lib/helpers/online', () => onlineHelperMock);
 
-  addRequestMock = jest.fn();
-  loadRequestMock = jest.fn();
-
   RequestQueryMock = {
-    add: (req) => addRequestMock(req),
-    load: (withClear) => loadRequestMock(withClear)
+    add: jest.fn(),
+    load: jest.fn()
   };
 
   fetchMock = jest.fn(() => new Promise(resolve => resolve({
     json: () => new Promise(resolve => resolve(fetchResponseMock))
   })));
-  onlineHelperMock = {};
+
+  onlineHelperMock = {
+    isOnline: jest.fn(),
+    onOnline: jest.fn()
+  };
 
   global.fetch = fetchMock;
 
@@ -34,7 +33,7 @@ beforeEach(() => {
 });
 
 test('it should send request if device is online on delayed fetch', () => {
-  onlineHelperMock.isOnline = jest.fn(() => new Promise(resolve => resolve(true)));
+  onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
 
   const testUrl = 'http://abracadabra.com';
   const testParams = {
@@ -50,7 +49,7 @@ test('it should send request if device is online on delayed fetch', () => {
 });
 
 test('it should add request to query if device is offline on delayed fetch', () => {
-  onlineHelperMock.isOnline = jest.fn(() => new Promise(resolve => resolve(false)));
+  onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(false));
 
   const testUrl = 'http://abracadabra.com';
   const testParams = {
@@ -60,12 +59,12 @@ test('it should add request to query if device is offline on delayed fetch', () 
   };
   const testRequest = new Request(testUrl, testParams);
 
-  addRequestMock = jest.fn(() => new Promise(resolve => resolve(true)));
+  RequestQueryMock.add.mockReturnValue(Promise.resolve(true));
 
   return DelayedFetch.delayedFetch(testUrl, testParams).catch((e) => {
     expect(fetchMock).not.toBeCalled();
 
-    expect(addRequestMock.mock.calls[0][0]).toEqual(testRequest);
+    expect(RequestQueryMock.add.mock.calls[0][0]).toEqual(testRequest);
 
     expect(e).toEqual(new DelayedFetch.DelayedRequestError('Request was delayed because of offline connection status'));
   });
@@ -73,10 +72,10 @@ test('it should add request to query if device is offline on delayed fetch', () 
 
 test('it should send requests from query if device becomes online on delayed fetch', () => {
   let onlineCb;
-  onlineHelperMock.onOnline = (cb) => {
+  onlineHelperMock.onOnline.mockImplementation((cb) => {
     onlineCb = cb;
-  };
-  onlineHelperMock.isOnline = jest.fn(() => new Promise(resolve => resolve(true)));
+  });
+  onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
 
   const testUrl = 'http://abracadabra.com';
   const testParams = {
@@ -86,20 +85,20 @@ test('it should send requests from query if device becomes online on delayed fet
   };
   const testRequest = new Request(testUrl, testParams);
 
-  loadRequestMock = jest.fn(() => new Promise(resolve => resolve([testRequest])));
+  RequestQueryMock.load.mockReturnValue(Promise.resolve([testRequest]));
 
   DelayedFetch.init();
 
   return new Promise(resolve => {
-    expect(loadRequestMock).not.toBeCalled();
+    expect(RequestQueryMock.load).not.toBeCalled();
     expect(fetchMock).not.toBeCalled();
 
     setTimeout(() => {
       onlineCb();
 
       setTimeout(() => {
-        expect(loadRequestMock).toBeCalled();
-        expect(loadRequestMock.mock.calls[0][0]).toEqual(true);
+        expect(RequestQueryMock.load).toBeCalled();
+        expect(RequestQueryMock.load.mock.calls[0][0]).toEqual(true);
 
         expect(fetchMock.mock.calls[0][0]).toEqual(testUrl);
         expect(fetchMock.mock.calls[0][1]).toEqual(testParams);
