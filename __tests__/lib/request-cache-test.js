@@ -9,14 +9,17 @@ beforeEach(() => {
     AsyncStorage: AsyncStorageMock
   }));
 
-  AsyncStorageMock = {};
+  AsyncStorageMock = {
+    setItem: jest.fn(),
+    getItem: jest.fn()
+  };
 
   RequestCache = require('../../lib/request-cache');
 });
 
 test('it should save cache with added request on add new request to empty cache', () => {
-  AsyncStorageMock.setItem = jest.fn(() => new Promise((resolve) => resolve()));
-  AsyncStorageMock.getItem = jest.fn(() => new Promise((resolve) => resolve(null)));
+  AsyncStorageMock.setItem.mockReturnValue(Promise.resolve());
+  AsyncStorageMock.getItem.mockReturnValue(Promise.resolve(null));
 
   const testUrl = 'http://abracadabra.com';
   const testParams = {
@@ -58,14 +61,13 @@ test('it should save cache with added request on add new request to filled cache
   };
   const savedTestRequestId = '345345345';
 
-
-  AsyncStorageMock.setItem = jest.fn(() => new Promise((resolve) => resolve()));
-  AsyncStorageMock.getItem = jest.fn(() => new Promise((resolve) => resolve(JSON.stringify({
+  AsyncStorageMock.setItem.mockReturnValue(Promise.resolve());
+  AsyncStorageMock.getItem.mockReturnValue(Promise.resolve(JSON.stringify({
     [savedTestRequestId]: {
       url: savedTestUrl,
       params: savedTestParams
     }
-  }))));
+  })));
 
   const testUrl = 'http://abracadabra.com';
   const testParams = {
@@ -111,13 +113,13 @@ test('it should get cache by it`s id', () => {
   };
   const savedTestRequestId = '345345345';
 
-  AsyncStorageMock.setItem = jest.fn(() => new Promise((resolve) => resolve()));
-  AsyncStorageMock.getItem = jest.fn(() => new Promise((resolve) => resolve(JSON.stringify({
+  AsyncStorageMock.setItem.mockReturnValue(Promise.resolve());
+  AsyncStorageMock.getItem.mockReturnValue(Promise.resolve(JSON.stringify({
     [savedTestRequestId]: {
       url: savedTestUrl,
       params: savedTestParams
     }
-  }))));
+  })));
 
   const testRequest = new Request(null, null);
   Object.defineProperty(testRequest, 'id', {value: savedTestRequestId});
@@ -131,8 +133,8 @@ test('it should get cache by it`s id', () => {
 });
 
 test('it should save cache with added request with response on add new request to empty cache', () => {
-  AsyncStorageMock.setItem = jest.fn(() => new Promise((resolve) => resolve()));
-  AsyncStorageMock.getItem = jest.fn(() => new Promise((resolve) => resolve(null)));
+  AsyncStorageMock.setItem.mockReturnValue(Promise.resolve());
+  AsyncStorageMock.getItem.mockReturnValue(Promise.resolve(null));
 
   const testUrl = 'http://abracadabra.com';
   const testParams = {
