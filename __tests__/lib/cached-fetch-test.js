@@ -84,6 +84,27 @@ test('it should load content from caches if device is offline on cached fetch', 
   });
 });
 
+test('it should throws exception if cache is empty and if device is offline on cached fetch', () => {
+  onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(false));
+
+  const testUrl = 'http://abracadabra.com';
+  const testParams = {
+    headers: {
+      someKey: 'someValue'
+    }
+  };
+
+  RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(null));
+
+  return CachedFetch.cachedFetch(testUrl, testParams, null).catch((e) => {
+    expect(fetchMock).not.toBeCalled();
+
+    expect(RequestCacheMock.getByRequest.mock.calls[0][0]).toEqual(new Request(testUrl, testParams));
+
+    expect(e).toEqual(new CachedFetch.NoCacheForRequestError('There are no cache for request'));
+  });
+});
+
 test('it should request version if device is online and request content version is different from cache version on version cached fetch', () => {
   const testVersion = 12;
   const testResponse = {body: 'html lorem ipsum'};
