@@ -48,7 +48,7 @@ test('it should request for content if device is online on cached fetch', () => 
 
   addRequestMock = jest.fn((request) => new Promise(resolve => resolve(true)));
 
-  return CachedFetch.cachedFetch(testUrl, testParams).then((response) => {
+  return CachedFetch.cachedFetch(testUrl, testParams).then(res => res.json()).then((response) => {
     expect(fetchMock.mock.calls.length).toBe(1);
     expect(fetchMock.mock.calls[0][0]).toEqual(testUrl);
     expect(fetchMock.mock.calls[0][1]).toEqual(testParams);
@@ -75,7 +75,7 @@ test('it should load content from caches if device is offline on cached fetch', 
   getByRequestMock = jest.fn(() => new Promise(resolve => resolve(testRequest)));
   addRequestMock = jest.fn((request) => new Promise(resolve => resolve(true)));
 
-  return CachedFetch.cachedFetch(null, null).then((response) => {
+  return CachedFetch.cachedFetch(null, null).then(res => res.json()).then((response) => {
     expect(fetchMock).not.toBeCalled();
     expect(getByRequestMock).toBeCalled();
 
@@ -116,7 +116,7 @@ test('it should request version if device is online and request content version 
 
   getByRequestMock = jest.fn(() => new Promise(resolve => resolve(testRequest)));
 
-  return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then((response) => {
+  return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then(res => res.json()).then((response) => {
     expect(fetchMock).toBeCalled();
     expect(fetchMock.mock.calls.length).toEqual(2);
 
@@ -159,7 +159,7 @@ test('it should request version if device is online and cache doesn`t exists on 
 
   getByRequestMock = jest.fn(() => new Promise(resolve => resolve(null)));
 
-  return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then((response) => {
+  return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then(res => res.json()).then((response) => {
     expect(fetchMock).toBeCalled();
     expect(fetchMock.mock.calls.length).toEqual(2);
 
@@ -197,7 +197,7 @@ test('it should request version if device is online and get content from cache i
 
   getByRequestMock = jest.fn(() => new Promise(resolve => resolve(testRequest)));
 
-  return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then((response) => {
+  return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then(res => res.json()).then((response) => {
     expect(fetchMock.mock.calls.length).toBe(1);
 
     expect(fetchMock.mock.calls[0][0]).toEqual(testVersionUrl);
@@ -225,7 +225,7 @@ test('it get content from cache if device is offline on version cached fetch', (
 
   getByRequestMock = jest.fn(() => new Promise(resolve => resolve(testRequest)));
 
-  return CachedFetch.versionCachedFetch(testUrl, testParams, null).then((response) => {
+  return CachedFetch.versionCachedFetch(testUrl, testParams, null).then(res => res.json()).then((response) => {
     expect(fetchMock).not.toBeCalled();
 
     expect(getByRequestMock.mock.calls[0][0]).toEqual(new Request(testUrl, testParams));
