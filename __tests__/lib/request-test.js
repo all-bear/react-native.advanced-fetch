@@ -102,11 +102,11 @@ test('it should get ready for json decoding', () => {
     someKey: 'someAnotherValue'
   };
 
-  const request = Request.fromJSON(JSON.stringify({
+  const request = Request.fromJSON({
     url: testUrl,
     params: testParams,
     response: testResponse
-  }));
+  });
 
   expect(request.url).toEqual(testUrl);
   expect(request.params).toEqual(testParams);
