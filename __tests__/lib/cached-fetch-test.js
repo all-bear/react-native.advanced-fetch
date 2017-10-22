@@ -195,7 +195,7 @@ test('it should request version if device is online and cache doesn`t exists on 
 
 test('it should request version if device is online and get content from cache if version is same on version cached fetch', () => {
   const testVersion = 12;
-  const testResponse = {body: 'html lorem ipsum', version: null};
+  const testResponse = {body: 'html lorem ipsum', version: testVersion};
 
   onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
 
@@ -225,7 +225,7 @@ test('it should request version if device is online and get content from cache i
     expect(fetchMock.mock.calls[0][0]).toEqual(testVersionUrl);
     expect(fetchMock.mock.calls[0][1]).toEqual(testParams);
 
-    expect(RequestCacheMock.getByRequest.mock.calls[0][0]).toEqual(new Request(testUrl, testParams));
+    expect(RequestCacheMock.getByRequest.mock.calls[0][0]).toEqual(testRequest);
 
     expect(response).toEqual(testResponse);
   });
@@ -301,6 +301,7 @@ test('it should save response with version if device is online and on version ca
 
   const testRequest = new Request(testUrl, testParams);
   testRequest.setVersion(testVersion);
+  testRequest.setResponse(testResponse);
 
   RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(null));
   RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
