@@ -1,7 +1,7 @@
-import { versionCachedFetch, cachedFetch, NoCacheForRequestError } from 'lib/cached-fetch';
-import { delayedFetch, DelayedRequestError } from 'lib/delayed-fetch';
+import { versionCachedFetch, cachedFetch, NoCacheForRequestError } from './lib/cached-fetch';
+import { delayedFetch, DelayedRequestError } from './lib/delayed-fetch';
 
-import { init as initDelayedFetch } from 'lib/delayed-fetch'
+import { init as initDelayedFetch } from './lib/delayed-fetch'
 
 export default {
   versionCachedFetch,
