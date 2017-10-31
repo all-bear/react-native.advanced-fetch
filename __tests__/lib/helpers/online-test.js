@@ -65,7 +65,7 @@ test('it should call callback from onOnline on NetInfo status change, if status 
   return new Promise(resolve => {
     setTimeout(() => {
       expect(onOnlineCb).toBeCalled();
-      expect(netInfoEventListenerSpy.mock.calls[0][0]).toEqual('change');
+      expect(netInfoEventListenerSpy.mock.calls[0][0]).toEqual('connectionChange');
 
       resolve();
     }, 2000);
