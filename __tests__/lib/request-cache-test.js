@@ -1,4 +1,3 @@
-let RequestCache;
 let AsyncStorageMock;
 import Request from '../../lib/request';
 
@@ -13,8 +12,6 @@ beforeEach(() => {
     setItem: jest.fn(),
     getItem: jest.fn()
   };
-
-  RequestCache = require('../../lib/request-cache');
 });
 
 test('it should save cache with added request on add new request to empty cache', () => {
@@ -38,6 +35,8 @@ test('it should save cache with added request on add new request to empty cache'
 
   jest.spyOn(testRequest, 'toJSON').mockImplementation(() => testEncodedRequest);
   Object.defineProperty(testRequest, 'id', {value: testRequestId});
+
+  const RequestCache = require('../../lib/request-cache');
 
   return RequestCache.add(testRequest).then(() => {
     expect(testRequest.toJSON).toBeCalled();
@@ -87,6 +86,8 @@ test('it should save cache with added request on add new request to filled cache
   jest.spyOn(testRequest, 'toJSON').mockImplementation(() => testEncodedRequest);
   Object.defineProperty(testRequest, 'id', {value: testRequestId});
 
+  const RequestCache = require('../../lib/request-cache');
+
   return RequestCache.add(testRequest).then(() => {
     expect(testRequest.toJSON).toBeCalled();
     expect(AsyncStorageMock.getItem.mock.calls[0][0]).toBe('@AdvancedFetch:cache');
@@ -124,6 +125,8 @@ test('it should get cache by it`s id', () => {
   const testRequest = new Request(null, null);
   Object.defineProperty(testRequest, 'id', {value: savedTestRequestId});
 
+  const RequestCache = require('../../lib/request-cache');
+
   return RequestCache.getByRequest(testRequest).then((request) => {
     expect(AsyncStorageMock.getItem.mock.calls[0][0]).toBe('@AdvancedFetch:cache');
     expect(AsyncStorageMock.setItem).not.toBeCalled();
@@ -159,6 +162,8 @@ test('it should save cache with added request with response on add new request t
 
   jest.spyOn(testRequest, 'toJSON').mockImplementation(() => testEncodedRequest);
   Object.defineProperty(testRequest, 'id', {value: testRequestId});
+
+  const RequestCache = require('../../lib/request-cache');
 
   return RequestCache.add(testRequest).then(() => {
     expect(testRequest.toJSON).toBeCalled();

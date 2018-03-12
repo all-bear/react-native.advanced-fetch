@@ -1,4 +1,3 @@
-let CachedFetch;
 let RequestCacheMock;
 let fetchMock;
 let fetchResponseMock;
@@ -9,7 +8,6 @@ import Request from '../../lib/request';
 beforeEach(() => {
   jest.resetModules();
 
-  jest.doMock('fetch', () => fetchMock);
   jest.doMock('../../lib/request-cache', () => RequestCacheMock);
   jest.doMock('../../lib/helpers/online', () => onlineHelperMock);
 
@@ -26,8 +24,6 @@ beforeEach(() => {
   };
 
   global.fetch = fetchMock;
-
-  CachedFetch = require('../../lib/cached-fetch');
 });
 
 test('it should request for content if device is online on cached fetch', () => {
@@ -45,6 +41,8 @@ test('it should request for content if device is online on cached fetch', () => 
   };
 
   RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
+
+  const CachedFetch = require('../../lib/cached-fetch');
 
   return CachedFetch.cachedFetch(testUrl, testParams).then(res => res.json()).then((response) => {
     expect(fetchMock.mock.calls.length).toBe(1);
@@ -73,6 +71,8 @@ test('it should load content from caches if device is offline on cached fetch', 
   RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(testRequest));
   RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
 
+  const CachedFetch = require('../../lib/cached-fetch');
+
   return CachedFetch.cachedFetch(null, null).then(res => res.json()).then((response) => {
     expect(fetchMock).not.toBeCalled();
     expect(RequestCacheMock.getByRequest).toBeCalled();
@@ -96,6 +96,8 @@ test('it should throws exception if cache is empty and if device is offline on c
 
   RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(null));
 
+  const CachedFetch = require('../../lib/cached-fetch');
+
   return CachedFetch.cachedFetch(testUrl, testParams, null).catch((e) => {
     expect(fetchMock).not.toBeCalled();
 
@@ -111,16 +113,13 @@ test('it should request version if device is online and request content version 
 
   onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
 
-  fetchMock = jest.fn()
+  fetchMock
     .mockReturnValueOnce(new Promise(resolve => resolve({
       json: () => new Promise(resolve => resolve({version: testVersion}))
     })))
     .mockReturnValueOnce(new Promise(resolve => resolve({
       json: () => new Promise(resolve => resolve(testResponse))
     })));
-
-  global.fetch = fetchMock;
-  CachedFetch = require('../../lib/cached-fetch');
 
   const testVersionUrl = 'http://abracadabra.com/version';
   const testUrl = 'http://abracadabra.com';
@@ -135,6 +134,8 @@ test('it should request version if device is online and request content version 
 
   RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
   RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(testRequest));
+
+  const CachedFetch = require('../../lib/cached-fetch');
 
   return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then(res => res.json()).then((response) => {
     expect(fetchMock).toBeCalled();
@@ -155,16 +156,13 @@ test('it should request version if device is online and cache doesn`t exists on 
 
   onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
 
-  fetchMock = jest.fn()
+  fetchMock
     .mockReturnValueOnce(new Promise(resolve => resolve({
       json: () => new Promise(resolve => resolve({version: testVersion}))
     })))
     .mockReturnValueOnce(new Promise(resolve => resolve({
       json: () => new Promise(resolve => resolve(testResponse))
     })));
-
-  global.fetch = fetchMock;
-  CachedFetch = require('../../lib/cached-fetch');
 
   const testVersionUrl = 'http://abracadabra.com/version';
   const testUrl = 'http://abracadabra.com';
@@ -179,6 +177,8 @@ test('it should request version if device is online and cache doesn`t exists on 
 
   RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
   RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(null));
+
+  const CachedFetch = require('../../lib/cached-fetch');
 
   return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then(res => res.json()).then((response) => {
     expect(fetchMock).toBeCalled();
@@ -201,9 +201,6 @@ test('it should request version if device is online and get content from cache i
 
   fetchResponseMock = {version: testVersion};
 
-  global.fetch = fetchMock;
-  CachedFetch = require('../../lib/cached-fetch');
-
   const testVersionUrl = 'http://abracadabra.com/version';
   const testUrl = 'http://abracadabra.com';
   const testParams = {
@@ -218,6 +215,8 @@ test('it should request version if device is online and get content from cache i
 
   RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
   RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(testRequest));
+
+  const CachedFetch = require('../../lib/cached-fetch');
 
   return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then(res => res.json()).then((response) => {
     expect(fetchMock.mock.calls.length).toBe(1);
@@ -247,6 +246,8 @@ test('it should get content from cache if device is offline on version cached fe
 
   RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(testRequest));
 
+  const CachedFetch = require('../../lib/cached-fetch');
+
   return CachedFetch.versionCachedFetch(testUrl, testParams, null).then(res => res.json()).then((response) => {
     expect(fetchMock).not.toBeCalled();
 
@@ -268,6 +269,8 @@ test('it should throws exception if cache is empty and if device is offline on v
 
   RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(null));
 
+  const CachedFetch = require('../../lib/cached-fetch');
+
   return CachedFetch.versionCachedFetch(testUrl, testParams, null).catch((e) => {
     expect(fetchMock).not.toBeCalled();
 
@@ -283,7 +286,7 @@ test('it should save response with version if device is online and on version ca
 
   onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
 
-  fetchMock = jest.fn()
+  fetchMock
     .mockReturnValueOnce(new Promise(resolve => resolve({
       json: () => Promise.resolve({version: testVersion})
     })))
@@ -306,7 +309,7 @@ test('it should save response with version if device is online and on version ca
   RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(null));
   RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
 
-  global.fetch = fetchMock;
+  const CachedFetch = require('../../lib/cached-fetch');
 
   return CachedFetch.versionCachedFetch(testUrl, testParams, testVersionUrl).then(res => res.json()).then(() => {
     expect(RequestCacheMock.add).toBeCalled();

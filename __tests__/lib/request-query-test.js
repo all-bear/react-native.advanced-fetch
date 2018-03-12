@@ -1,4 +1,3 @@
-let RequestQuery;
 let AsyncStorageMock;
 import Request from '../../lib/request';
 
@@ -13,8 +12,6 @@ beforeEach(() => {
     setItem: jest.fn(),
     getItem: jest.fn()
   };
-
-  RequestQuery = require('../../lib/request-query');
 });
 
 test('it should save query with added request on add new request to empty query', () => {
@@ -36,6 +33,8 @@ test('it should save query with added request on add new request to empty query'
   };
 
   jest.spyOn(testRequest, 'toJSON').mockImplementation(() => testEncodedRequest);
+
+  const RequestQuery = require('../../lib/request-query');
 
   return RequestQuery.add(testRequest).then(() => {
     expect(testRequest.toJSON).toBeCalled();
@@ -83,6 +82,8 @@ test('it should save query with added request on add new request to filled query
 
   jest.spyOn(testRequest, 'toJSON').mockImplementation(() => testEncodedRequest);
 
+  const RequestQuery = require('../../lib/request-query');
+
   return RequestQuery.add(testRequest).then(() => {
     expect(testRequest.toJSON).toBeCalled();
     expect(AsyncStorageMock.getItem.mock.calls[0][0]).toBe('@AdvancedFetch:query');
@@ -116,6 +117,8 @@ test('it should load query', () => {
     }
   ])));
 
+  const RequestQuery = require('../../lib/request-query');
+
   return RequestQuery.load().then((query) => {
     expect(AsyncStorageMock.setItem).not.toBeCalled();
     expect(AsyncStorageMock.getItem.mock.calls[0][0]).toBe('@AdvancedFetch:query');
@@ -139,6 +142,8 @@ test('it should clear query if flag is presented', () => {
       params: savedTestParams
     }
   ])));
+
+  const RequestQuery = require('../../lib/request-query');
 
   return RequestQuery.load(true).then((query) => {
     expect(AsyncStorageMock.getItem.mock.calls[0][0]).toBe('@AdvancedFetch:query');
