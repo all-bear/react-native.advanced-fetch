@@ -57,3 +57,17 @@ test('it should call callback from onOnline on NetInfo status change, if status 
     }, 2000);
   });
 });
+
+test('it should wait until connection status request ends and response with this status on isOnline request', () => {
+  NetInfoMock.isConnected.addEventListener.mockImplementation((event, cb) => {
+    setTimeout(() => {
+      cb(true)
+    }, 100)
+  });
+
+  const isOnline = require('../../../lib/helpers/online').isOnline;
+
+  return isOnline().then(status => {
+    expect(status).toBe(true);
+  });
+});
