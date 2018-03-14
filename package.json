@@ -1,6 +1,6 @@
 {
   "name": "react-native-advanced-fetch",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Extended fetch with caching and delayed requests",
   "main": "index.js",
   "scripts": {

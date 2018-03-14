@@ -2,6 +2,7 @@ let fetchMock;
 let fetchResponseMock;
 let onlineHelperMock;
 let RequestQueryMock;
+let settingsMock;
 
 import Request from '../../lib/request';
 
@@ -10,6 +11,7 @@ beforeEach(() => {
 
   jest.doMock('../../lib/request-query', () => RequestQueryMock);
   jest.doMock('../../lib/helpers/online', () => onlineHelperMock);
+  jest.doMock('../../lib/helpers/settings', () => settingsMock);
 
   RequestQueryMock = {
     add: jest.fn(),
@@ -25,7 +27,13 @@ beforeEach(() => {
     onOnline: jest.fn()
   };
 
-  global.fetch = fetchMock;
+  settingsMock = {
+    getSettings: jest.fn(() => {
+      return {
+        fetch: fetchMock
+      }
+    })
+  };
 });
 
 test('it should send request if device is online on delayed fetch', () => {

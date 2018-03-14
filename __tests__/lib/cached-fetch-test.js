@@ -2,6 +2,7 @@ let RequestCacheMock;
 let fetchMock;
 let fetchResponseMock;
 let onlineHelperMock;
+let settingsMock;
 
 import Request from '../../lib/request';
 
@@ -10,11 +11,13 @@ beforeEach(() => {
 
   jest.doMock('../../lib/request-cache', () => RequestCacheMock);
   jest.doMock('../../lib/helpers/online', () => onlineHelperMock);
+  jest.doMock('../../lib/helpers/settings', () => settingsMock);
 
   RequestCacheMock = {
     getByRequest: jest.fn(),
     add: jest.fn()
   };
+
   fetchMock = jest.fn(() => Promise.resolve({
     json: () => Promise.resolve(fetchResponseMock)
   }));
@@ -23,7 +26,13 @@ beforeEach(() => {
     isOnline: jest.fn()
   };
 
-  global.fetch = fetchMock;
+  settingsMock = {
+    getSettings: jest.fn(() => {
+      return {
+        fetch: fetchMock
+      }
+    })
+  };
 });
 
 test('it should request for content if device is online on cached fetch', () => {

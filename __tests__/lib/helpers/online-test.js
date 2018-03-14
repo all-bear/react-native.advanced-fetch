@@ -1,4 +1,5 @@
 let NetInfoMock;
+let settingsMock;
 
 beforeEach(() => {
   jest.resetModules();
@@ -9,9 +10,18 @@ beforeEach(() => {
     }
   };
 
+  settingsMock = {
+    getSettings: jest.fn(() => {
+      return {
+        waitingForConnectionChangeInterval: 100
+      }
+    })
+  };
+
   jest.doMock('react-native', () => ({
     NetInfo: NetInfoMock
   }));
+  jest.doMock('../../../lib/helpers/settings', () => settingsMock);
 });
 
 test('it should resolve promise from isOnline with `true` if NetInfo status online', () => {
