@@ -4,7 +4,8 @@
   "description": "Extended fetch with caching and delayed requests",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "setup-git-hooks": "cp -a ./.git-hooks/. ./.git/hooks && chmod +x ./.git/hooks/*"
   },
   "author": "Oleh Biriukov",
   "license": "ISC",
@@ -27,11 +28,13 @@
   },
   "devDependencies": {
     "babel-jest": "^21.2.0",
+    "eslint": "^4.18.2",
+    "eslint-config-google": "^0.9.1",
+    "babel-preset-es2015": "^6.24.1",
     "jest": "^21.2.1",
     "react-native": "^0.49.2"
   },
   "dependencies": {
-    "babel-preset-es2015": "^6.24.1",
     "string-hash": "^1.1.3"
   }
 }
