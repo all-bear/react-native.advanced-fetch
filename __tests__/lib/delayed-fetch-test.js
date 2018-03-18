@@ -15,24 +15,24 @@ beforeEach(() => {
 
   RequestQueryMock = {
     add: jest.fn(),
-    load: jest.fn()
+    load: jest.fn(),
   };
 
-  fetchMock = jest.fn(() => new Promise(resolve => resolve({
-    json: () => new Promise(resolve => resolve(fetchResponseMock))
+  fetchMock = jest.fn(() => new Promise((resolve) => resolve({
+    json: () => new Promise((resolve) => resolve(fetchResponseMock)),
   })));
 
   onlineHelperMock = {
     isOnline: jest.fn(),
-    onOnline: jest.fn()
+    onOnline: jest.fn(),
   };
 
   settingsMock = {
     getSettings: jest.fn(() => {
       return {
-        fetch: fetchMock
-      }
-    })
+        fetch: fetchMock,
+      };
+    }),
   };
 });
 
@@ -42,8 +42,8 @@ test('it should send request if device is online on delayed fetch', () => {
   const testUrl = 'http://abracadabra.com';
   const testParams = {
     headers: {
-      someKey: 'someValue'
-    }
+      someKey: 'someValue',
+    },
   };
 
   const DelayedFetch = require('../../lib/delayed-fetch');
@@ -60,8 +60,8 @@ test('it should add request to query if device is offline on delayed fetch', () 
   const testUrl = 'http://abracadabra.com';
   const testParams = {
     headers: {
-      someKey: 'someValue'
-    }
+      someKey: 'someValue',
+    },
   };
   const testRequest = new Request(testUrl, testParams);
 
@@ -88,8 +88,8 @@ test('it should send requests from query if device becomes online on delayed fet
   const testUrl = 'http://abracadabra.com';
   const testParams = {
     headers: {
-      someKey: 'someValue'
-    }
+      someKey: 'someValue',
+    },
   };
   const testRequest = new Request(testUrl, testParams);
 
@@ -99,7 +99,7 @@ test('it should send requests from query if device becomes online on delayed fet
 
   DelayedFetch.init();
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     expect(RequestQueryMock.load).not.toBeCalled();
     expect(fetchMock).not.toBeCalled();
 
@@ -114,7 +114,7 @@ test('it should send requests from query if device becomes online on delayed fet
         expect(fetchMock.mock.calls[0][0]).toEqual(testUrl);
         expect(fetchMock.mock.calls[0][1]).toEqual(testParams);
 
-        resolve()
+        resolve();
       }, 0);
     }, 400);
   });

@@ -5,7 +5,7 @@ beforeEach(() => {
 
   fetchMock = jest.fn();
 
-  global.fetch = fetchMock
+  global.fetch = fetchMock;
 });
 
 test('it should contain some default settings', () => {
@@ -29,7 +29,7 @@ test('it should rewrite default settings', () => {
 
   setSettings({
     fetch: fetchRewrite,
-    waitingForConnectionChangeInterval: waitingForConnectionChangeIntervalRewrite
+    waitingForConnectionChangeInterval: waitingForConnectionChangeIntervalRewrite,
   });
 
   const settingsAfterRewrite = getSettings();

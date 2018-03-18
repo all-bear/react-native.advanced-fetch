@@ -6,20 +6,20 @@ beforeEach(() => {
 
   NetInfoMock = {
     isConnected: {
-      addEventListener: jest.fn()
-    }
+      addEventListener: jest.fn(),
+    },
   };
 
   settingsMock = {
     getSettings: jest.fn(() => {
       return {
-        waitingForConnectionChangeInterval: 100
-      }
-    })
+        waitingForConnectionChangeInterval: 100,
+      };
+    }),
   };
 
   jest.doMock('react-native', () => ({
-    NetInfo: NetInfoMock
+    NetInfo: NetInfoMock,
   }));
   jest.doMock('../../../lib/helpers/settings', () => settingsMock);
 });
@@ -29,7 +29,7 @@ test('it should resolve promise from isOnline with `true` if NetInfo status onli
 
   const isOnline = require('../../../lib/helpers/online').isOnline;
 
-  return isOnline().then(status => {
+  return isOnline().then((status) => {
     expect(status).toBe(true);
   });
 });
@@ -39,7 +39,7 @@ test('it should resolve promise from isOnline with `false` if NetInfo status off
 
   const isOnline = require('../../../lib/helpers/online').isOnline;
 
-  return isOnline().then(status => {
+  return isOnline().then((status) => {
     expect(status).toBe(false);
   });
 });
@@ -47,7 +47,7 @@ test('it should resolve promise from isOnline with `false` if NetInfo status off
 test('it should call callback from onOnline on NetInfo status change, if status is online', () => {
   NetInfoMock.isConnected.addEventListener.mockImplementation((event, cb) => {
     setTimeout(() => {
-      cb(true)
+      cb(true);
     }, 1000);
   });
 
@@ -58,7 +58,7 @@ test('it should call callback from onOnline on NetInfo status change, if status 
 
   onOnline(onOnlineCb);
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       expect(onOnlineCb).toBeCalled();
       expect(netInfoEventListenerSpy.mock.calls[0][0]).toEqual('connectionChange');
@@ -71,13 +71,13 @@ test('it should call callback from onOnline on NetInfo status change, if status 
 test('it should wait until connection status request ends and response with this status on isOnline request', () => {
   NetInfoMock.isConnected.addEventListener.mockImplementation((event, cb) => {
     setTimeout(() => {
-      cb(true)
-    }, 100)
+      cb(true);
+    }, 100);
   });
 
   const isOnline = require('../../../lib/helpers/online').isOnline;
 
-  return isOnline().then(status => {
+  return isOnline().then((status) => {
     expect(status).toBe(true);
   });
 });

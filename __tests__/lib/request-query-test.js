@@ -5,12 +5,12 @@ beforeEach(() => {
   jest.resetModules();
 
   jest.doMock('react-native', () => ({
-    AsyncStorage: AsyncStorageMock
+    AsyncStorage: AsyncStorageMock,
   }));
 
   AsyncStorageMock = {
     setItem: jest.fn(),
-    getItem: jest.fn()
+    getItem: jest.fn(),
   };
 });
 
@@ -21,15 +21,15 @@ test('it should save query with added request on add new request to empty query'
   const testUrl = 'http://abracadabra.com';
   const testParams = {
     headers: {
-      someKey: 'someValue'
-    }
+      someKey: 'someValue',
+    },
   };
 
   const testRequest = new Request(testUrl, testParams);
 
   const testEncodedRequest = {
     url: testUrl,
-    params: testParams
+    params: testParams,
   };
 
   jest.spyOn(testRequest, 'toJSON').mockImplementation(() => testEncodedRequest);
@@ -43,8 +43,8 @@ test('it should save query with added request on add new request to empty query'
     expect(AsyncStorageMock.setItem.mock.calls[0][1]).toEqual(JSON.stringify([
       {
         url: testUrl,
-        params: testParams
-      }
+        params: testParams,
+      },
     ]));
   });
 });
@@ -53,8 +53,8 @@ test('it should save query with added request on add new request to filled query
   const savedTestUrl = 'http://abracadabra3.com';
   const savedTestParams = {
     headers: {
-      someKey: 'someValue'
-    }
+      someKey: 'someValue',
+    },
   };
 
 
@@ -62,22 +62,22 @@ test('it should save query with added request on add new request to filled query
   AsyncStorageMock.getItem.mockReturnValue(Promise.resolve(JSON.stringify([
     {
       url: savedTestUrl,
-      params: savedTestParams
-    }
+      params: savedTestParams,
+    },
   ])));
 
   const testUrl = 'http://abracadabra.com';
   const testParams = {
     headers: {
-      someKey: 'someValue'
-    }
+      someKey: 'someValue',
+    },
   };
 
   const testRequest = new Request(testUrl, testParams);
 
   const testEncodedRequest = {
     url: testUrl,
-    params: testParams
+    params: testParams,
   };
 
   jest.spyOn(testRequest, 'toJSON').mockImplementation(() => testEncodedRequest);
@@ -92,12 +92,12 @@ test('it should save query with added request on add new request to filled query
     expect(AsyncStorageMock.setItem.mock.calls[0][1]).toEqual(JSON.stringify([
       {
         url: savedTestUrl,
-        params: savedTestParams
+        params: savedTestParams,
       },
       {
         url: testUrl,
-        params: testParams
-      }
+        params: testParams,
+      },
     ]));
   });
 });
@@ -106,15 +106,15 @@ test('it should load query', () => {
   const savedTestUrl = 'http://abracadabra3.com';
   const savedTestParams = {
     headers: {
-      someKey: 'someValue'
-    }
+      someKey: 'someValue',
+    },
   };
   AsyncStorageMock.setItem.mockReturnValue(Promise.resolve());
   AsyncStorageMock.getItem.mockReturnValue(Promise.resolve(JSON.stringify([
     {
       url: savedTestUrl,
-      params: savedTestParams
-    }
+      params: savedTestParams,
+    },
   ])));
 
   const RequestQuery = require('../../lib/request-query');
@@ -131,16 +131,16 @@ test('it should clear query if flag is presented', () => {
   const savedTestUrl = 'http://abracadabra3.com';
   const savedTestParams = {
     headers: {
-      someKey: 'someValue'
-    }
+      someKey: 'someValue',
+    },
   };
 
   AsyncStorageMock.setItem.mockReturnValue(Promise.resolve());
   AsyncStorageMock.getItem.mockReturnValue(Promise.resolve(JSON.stringify([
     {
       url: savedTestUrl,
-      params: savedTestParams
-    }
+      params: savedTestParams,
+    },
   ])));
 
   const RequestQuery = require('../../lib/request-query');
