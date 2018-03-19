@@ -58,6 +58,9 @@ test('it should save cache with added request on add new request to filled cache
       someKey: 'someValue',
     },
   };
+  const savedTestMeta = {
+    createdAt: 123,
+  };
   const savedTestRequestId = '345345345';
 
   AsyncStorageMock.setItem.mockReturnValue(Promise.resolve());
@@ -65,6 +68,7 @@ test('it should save cache with added request on add new request to filled cache
     [savedTestRequestId]: {
       url: savedTestUrl,
       params: savedTestParams,
+      meta: savedTestMeta,
     },
   })));
 
@@ -74,12 +78,16 @@ test('it should save cache with added request on add new request to filled cache
       someKey: 'someValue',
     },
   };
+  const testMeta = {
+    createdAt: 123,
+  };
 
-  const testRequest = new Request(testUrl, testParams);
+  const testRequest = new Request(testUrl, testParams, testMeta);
 
   const testEncodedRequest = {
     url: testUrl,
     params: testParams,
+    meta: testMeta,
   };
   const testRequestId = '23421411';
 
@@ -96,10 +104,12 @@ test('it should save cache with added request on add new request to filled cache
       [savedTestRequestId]: {
         url: savedTestUrl,
         params: savedTestParams,
+        meta: savedTestMeta,
       },
       [testRequestId]: {
         url: testUrl,
         params: testParams,
+        meta: testMeta,
       },
     }));
   });

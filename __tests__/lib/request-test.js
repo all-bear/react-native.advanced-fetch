@@ -80,7 +80,11 @@ test('it should get ready for json encoding', () => {
     someKey: 'someAnotherValue',
   };
 
-  const request = new Request(testUrl, testParams);
+  const testMeta = {
+    createdAt: 123,
+  };
+
+  const request = new Request(testUrl, testParams, testMeta);
 
   request.setResponse(testResponse);
 
@@ -88,6 +92,7 @@ test('it should get ready for json encoding', () => {
     url: testUrl,
     params: testParams,
     response: testResponse,
+    meta: testMeta,
   }));
 });
 
@@ -111,4 +116,14 @@ test('it should get ready for json decoding', () => {
   expect(request.url).toEqual(testUrl);
   expect(request.params).toEqual(testParams);
   expect(request.getResponse()).toEqual(testResponse);
+});
+
+test('it should set meta constructor', () => {
+  const testMeta = {
+    createdAt: Date.now(),
+  };
+
+  const request = new Request('', {}, testMeta);
+
+  expect(request.meta).toEqual(testMeta);
 });
