@@ -3,8 +3,10 @@ let fetchResponseMock;
 let onlineHelperMock;
 let RequestQueryMock;
 let settingsMock;
+let settingsDataMock;
 
 import Request from '../../lib/request';
+import _ from 'underscore';
 
 beforeEach(() => {
   jest.resetModules();
@@ -27,12 +29,12 @@ beforeEach(() => {
     onOnline: jest.fn(),
   };
 
+  settingsDataMock = {
+    fetch: fetchMock,
+  };
+
   settingsMock = {
-    getSettings: jest.fn(() => {
-      return {
-        fetch: fetchMock,
-      };
-    }),
+    getSettings: jest.fn(() => settingsDataMock),
   };
 });
 
@@ -72,7 +74,7 @@ test('it should add request to query if device is offline on delayed fetch', () 
   return DelayedFetch.delayedFetch(testUrl, testParams).catch((e) => {
     expect(fetchMock).not.toBeCalled();
 
-    expect(RequestQueryMock.add.mock.calls[0][0]).toEqual(testRequest);
+    expect(_.omit(RequestQueryMock.add.mock.calls[0][0], 'meta')).toEqual(_.omit(testRequest, 'meta'));
 
     expect(e).toEqual(new DelayedFetch.DelayedRequestError('Request was delayed because of offline connection status'));
   });
@@ -117,5 +119,57 @@ test('it should send requests from query if device becomes online on delayed fet
         resolve();
       }, 0);
     }, 400);
+  });
+});
+
+test('it should not to send delayed request if it`s lifetime exceeded, and call exceeded lifetime callback on delayed fetch', () => {
+  let onlineCb;
+
+  onlineHelperMock.onOnline.mockImplementation((cb) => {
+    onlineCb = cb;
+  });
+  onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(false));
+
+  const testUrl = 'http://abracadabra.com';
+  const testParams = {
+    headers: {
+      someKey: 'someValue',
+    },
+  };
+
+  const queryMock = [];
+  RequestQueryMock.add.mockImplementation((request) => {
+    queryMock.push(request);
+
+    return Promise.resolve(request);
+  });
+  RequestQueryMock.load.mockReturnValue(Promise.resolve(queryMock));
+
+  const DelayedFetch = require('../../lib/delayed-fetch');
+
+  const onExceededDelayedRequestLifetimeMock = jest.fn();
+
+  settingsDataMock.delayedRequestLifetime = 300;
+  settingsDataMock.onExceededDelayedRequestLifetime = onExceededDelayedRequestLifetimeMock;
+
+  DelayedFetch.init();
+
+  return new Promise((resolve) => {
+    DelayedFetch.delayedFetch(testUrl, testParams).catch(() => {
+      onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
+
+      setTimeout(() => {
+        onlineCb();
+
+        setTimeout(() => {
+          expect(fetchMock).not.toBeCalled();
+          expect(onExceededDelayedRequestLifetimeMock).toBeCalled();
+          expect(onExceededDelayedRequestLifetimeMock.mock.calls[0][0].id)
+            .toEqual(new Request(testUrl, testParams).id);
+
+          resolve();
+        }, 0);
+      }, 400);
+    });
   });
 });
