@@ -209,3 +209,54 @@ test('it should call onProcessedDelayedRequest callback when request is processe
     }, 0);
   });
 });
+
+test('it should call beforeSendDelayedRequest callback and use updated request before request is processed in background on delayed fetch', () => {
+  let onlineCb;
+  onlineHelperMock.onOnline.mockImplementation((cb) => {
+    onlineCb = cb;
+  });
+  onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
+
+  const requestQuery = [
+    new Request('http://abracadabra1.com', {
+      headers: {someKey: 'someVal2'},
+    }),
+    new Request('http://abracadabra2.com', {
+      headers: {someKey: 'someVal2'},
+    }),
+  ];
+
+  const modifiedRequestQuery = [
+    new Request('http://abracadabra1.com-modified'),
+    new Request('http://abracadabra2.com-modified'),
+  ];
+
+  RequestQueryMock.load.mockReturnValue(Promise.resolve(requestQuery));
+
+  const DelayedFetch = require('../../lib/delayed-fetch');
+
+  DelayedFetch.init();
+
+  const beforeSendDelayedRequestMock = jest.fn().mockImplementation((request) => {
+    request.url = `${request.url}-modified`;
+
+    return request;
+  });
+  settingsDataMock.beforeSendDelayedRequest = beforeSendDelayedRequestMock;
+
+  return new Promise((resolve) => {
+    onlineCb();
+
+    setTimeout(() => {
+      expect(beforeSendDelayedRequestMock).toBeCalled();
+
+      expect(beforeSendDelayedRequestMock.mock.calls[0][0].id).toEqual(requestQuery[0].id);
+      expect(beforeSendDelayedRequestMock.mock.calls[1][0].id).toEqual(requestQuery[1].id);
+
+      expect(fetchMock.mock.calls[0][0]).toEqual(modifiedRequestQuery[0].url);
+      expect(fetchMock.mock.calls[1][0]).toEqual(modifiedRequestQuery[1].url);
+
+      resolve();
+    }, 0);
+  });
+});
