@@ -173,3 +173,39 @@ test('it should not to send delayed request if it`s lifetime exceeded, and call 
     });
   });
 });
+
+test('it should call onProcessedDelayedRequest callback when request is processed in background on delayed fetch', () => {
+  let onlineCb;
+  onlineHelperMock.onOnline.mockImplementation((cb) => {
+    onlineCb = cb;
+  });
+  onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
+
+  const testUrl = 'http://abracadabra.com';
+  const testParams = {
+    headers: {
+      someKey: 'someValue',
+    },
+  };
+  const testRequest = new Request(testUrl, testParams);
+
+  RequestQueryMock.load.mockReturnValue(Promise.resolve([testRequest]));
+
+  const DelayedFetch = require('../../lib/delayed-fetch');
+
+  DelayedFetch.init();
+
+  const onProcessedDelayedRequestMock = jest.fn();
+  settingsDataMock.onProcessedDelayedRequest = onProcessedDelayedRequestMock;
+
+  return new Promise((resolve) => {
+    onlineCb();
+
+    setTimeout(() => {
+      expect(onProcessedDelayedRequestMock).toBeCalled();
+      expect(onProcessedDelayedRequestMock.mock.calls[0][0].id).toEqual(new Request(testUrl, testParams).id);
+
+      resolve();
+    }, 0);
+  });
+});
