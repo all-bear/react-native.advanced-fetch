@@ -1,5 +1,6 @@
 let NetInfoMock;
 let settingsMock;
+let settingsData;
 
 beforeEach(() => {
   jest.resetModules();
@@ -10,12 +11,14 @@ beforeEach(() => {
     },
   };
 
+  settingsData = {
+    waitingForConnectionChangeInterval: 100,
+    isOnline: null,
+    onOnline: null,
+  };
+
   settingsMock = {
-    getSettings: jest.fn(() => {
-      return {
-        waitingForConnectionChangeInterval: 100,
-      };
-    }),
+    getSettings: jest.fn(() => settingsData),
   };
 
   jest.doMock('react-native', () => ({
@@ -74,6 +77,18 @@ test('it should wait until connection status request ends and response with this
       cb(true);
     }, 100);
   });
+
+  const isOnline = require('../../../lib/helpers/online').isOnline;
+
+  return isOnline().then((status) => {
+    expect(status).toBe(true);
+  });
+});
+
+test('it should get isOnline promise from settings, if it provided', () => {
+  settingsData.onOnlineOfflineStatusChange = (cb) => {
+    cb(true);
+  };
 
   const isOnline = require('../../../lib/helpers/online').isOnline;
 

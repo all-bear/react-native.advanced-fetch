@@ -85,5 +85,8 @@ init({
         // this cb will be executed when delayed request exceed it lifetime and will not be processed 
     },
     startDelayedRequestWorker: false, // process delayed requests in background
+    onOnlineOfflineStatusChange: (cb) => {
+      cb(status) // you need to call cb with new status (boolean) in a case if you have custom logic for online/offline change strategy, by default `NetInfo.isConnected.addEventListener('connectionChange', cb)` is used to findout is device online/offline (by default it's offline so you need to call this cb to change status)
+    }
 }); 
 ```
