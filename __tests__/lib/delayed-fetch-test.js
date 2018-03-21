@@ -31,6 +31,7 @@ beforeEach(() => {
 
   settingsDataMock = {
     fetch: fetchMock,
+    startDelayedRequestWorker: true,
   };
 
   settingsMock = {
@@ -260,3 +261,29 @@ test('it should call beforeSendDelayedRequest callback and use updated request b
     }, 0);
   });
 });
+
+test('it should not run background worker by default, run it only if option `startDelayedRequestWorker` is true on delayed fetch', () => {
+  let onlineCb;
+  onlineHelperMock.onOnline.mockImplementation((cb) => {
+    onlineCb = cb;
+  });
+  onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
+
+  const DelayedFetch = require('../../lib/delayed-fetch');
+
+  settingsDataMock.startDelayedRequestWorker = false;
+
+  DelayedFetch.init();
+
+  return new Promise((resolve) => {
+    onlineCb();
+
+    setTimeout(() => {
+      expect(RequestQueryMock.load).not.toBeCalled();
+      expect(fetchMock).not.toBeCalled();
+
+      resolve();
+    }, 0);
+  });
+});
+
