@@ -13,7 +13,13 @@ Make a reqeust to server, in a case if device is offline, and this request was d
 import { cachedFetch, NoCacheForRequestError } from 'react-native-advanced-fetch';
 
 cachedFetch(url, params)
-    .then(res => res.json()) // for now it works only with json
+    .then(res => {
+      if (res.cached) {
+        // do something if response is cached (because of offline device status)
+      }
+    
+      return res.json()
+    }) // for now it works only with json
     .then(data => {
         // do work, data will be data from server or cached data if device is offline
     })

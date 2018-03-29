@@ -116,6 +116,52 @@ test('it should throws exception if cache is empty and if device is offline on c
   });
 });
 
+test('it should have cached flag on response if device is offline on cached fetch', () => {
+  const testResponse = {body: 'html lorem ipsum'};
+  onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(false));
+
+  const testUrl = 'http://abracadabra.com';
+  const testParams = {
+    headers: {
+      someKey: 'someValue',
+    },
+  };
+  const testRequest = new Request(testUrl, testParams);
+  testRequest.setResponse(testResponse);
+
+  RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(testRequest));
+  RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
+
+  const CachedFetch = require('../../lib/cached-fetch');
+
+  return CachedFetch.cachedFetch(null, null).then((res) => {
+    expect(res.cached).toBe(true);
+  });
+});
+
+test('it should NO have cached flag on response if device is offline on cached fetch', () => {
+  const testResponse = {body: 'html lorem ipsum'};
+  onlineHelperMock.isOnline.mockReturnValue(Promise.resolve(true));
+
+  const testUrl = 'http://abracadabra.com';
+  const testParams = {
+    headers: {
+      someKey: 'someValue',
+    },
+  };
+  const testRequest = new Request(testUrl, testParams);
+  testRequest.setResponse(testResponse);
+
+  RequestCacheMock.getByRequest.mockReturnValue(Promise.resolve(testRequest));
+  RequestCacheMock.add.mockReturnValue(Promise.resolve(true));
+
+  const CachedFetch = require('../../lib/cached-fetch');
+
+  return CachedFetch.cachedFetch(null, null).then((res) => {
+    expect(res.cached).toBeFalsy();
+  });
+});
+
 test('it should request version if device is online and request content version is different from cache version on version cached fetch', () => {
   const testVersion = 12;
   const testResponse = {body: 'html lorem ipsum'};
