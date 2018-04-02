@@ -99,4 +99,4 @@ init({
 
 ## Note
 
-You should include `ACCESS_NETWORK_STATE` permission on Android
+You should include `ACCESS_NETWORK_STATE`, `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE` permission on Android
