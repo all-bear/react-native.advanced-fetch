@@ -96,3 +96,7 @@ init({
     }
 }); 
 ```
+
+## Note
+
+You should include `ACCESS_NETWORK_STATE` permission on Android
